@@ -85,3 +85,47 @@ void MyDataStore::dump(ostream& ofile) {
   }
   ofile << "</users>" << endl;
 }
+
+bool MyDataStore::addToCart(string username, Product* p) {
+  if (findUser(username) == NULL) {
+    return false;
+  }
+  carts_[convToLower(username)].push_back(p);
+  return true;
+}
+
+bool MyDataStore::viewCart(string username) {
+  if (findUser(username) == NULL) {
+    return false;
+  }
+  vector<Product*> cart = carts_[convToLower(username)];
+  for (size_t i = 0; i < cart.size(); i++) {
+    cout << "Item " << i + 1 << endl;
+    cout <<cart[i]->displayString() << endl;
+    cout << endl;
+  }
+  return true;
+}
+
+bool MyDataStore::buyCart(string username) {
+  User* user = findUser(username);
+  if (user == NULL) {
+    return false;
+  }
+
+  string name = convToLower(username);
+  vector<Product*> leftover;
+
+  for(size_t i = 0; i < carts_[name].size(); i++) {
+    Product* p = carts_[name][i];
+    if (p->getQty() > 0 && user->getBalance() >= p->getPrice()) {
+      p->subtractQty(1);
+      user->deductAmount(p->getPrice());
+    }
+    else {
+      leftover.push_back(p);
+    }
+  }
+  carts_[name] = leftover;
+  return true;
+}
