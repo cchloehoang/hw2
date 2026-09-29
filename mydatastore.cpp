@@ -38,3 +38,50 @@ void MyDataStore::addProduct(Product* p) {
     keywordMap_[word].insert(p);
   }
 }
+
+vector<Product*>MyDataStore::search(vector<string>& terms, int type) {
+  set<Product*> result; //found
+  //make stuff owercase
+  for (size_t i = 0; i < terms.size(); i++) {
+    string term = convToLower(terms[i]);
+    //get
+    //start with products
+    //for and keep only products
+    //or combine
+    set<Product*> matches;
+    if (keywordMap_.count(term) > 0) {
+      matches = keywordMap_[term];
+    }
+
+    if (i == 0) {
+      result = matches;
+    }
+    else if (type == 0) {
+      result = setIntersection(result, matches);
+    }
+    else {
+      result = setUnion(result, matches);
+    }
+  }
+
+  vector<Product*> hits;
+  for (set<Product*>::iterator it = result.begin(); it != result.end(); it++) {
+    hits.push_back(*it);
+  }
+  return hits;
+}
+
+void MyDataStore::dump(ostream& ofile) {
+  ofile << "<products>" << endl;
+  for (size_t i = 0; i <products_.size(); i++) {
+    //write in
+    products_[i]->dump(ofile);
+  }
+  ofile << "</products>" << endl;
+  ofile << "<users>" << endl;
+  for (size_t i = 0; i <users_.size(); i++) {
+    //write in
+    users_[i]->dump(ofile);
+  }
+  ofile << "</users>" << endl;
+}
